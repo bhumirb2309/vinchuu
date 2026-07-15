@@ -152,28 +152,6 @@
   .brand-name { font-family: var(--font-display); font-size: 1rem; letter-spacing: -0.01em; }
   .brand-est { font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; opacity: 0.6; }
 
-  .mode-toggle {
-    display: inline-flex;
-    background: rgba(244,237,226,0.65);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(26,20,16,0.12);
-    border-radius: 999px;
-    padding: 4px;
-    box-shadow: 0 4px 20px -8px rgba(26,20,16,0.2);
-  }
-  .mode-toggle button {
-    padding: 8px 18px;
-    font-size: 0.8rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    border-radius: 999px;
-    color: var(--ink);
-    font-weight: 500;
-    transition: background 0.3s ease, color 0.3s ease;
-  }
-  .mode-toggle button.active { background: var(--ink); color: var(--cream); }
-
   .top-nav { display: flex; align-items: center; gap: 28px; font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase; }
   .top-nav a { text-decoration: none; transition: opacity 0.2s ease; }
   .top-nav a:hover { opacity: 0.6; }
@@ -203,9 +181,6 @@
   .meta-bar span { display: inline-flex; align-items: center; gap: 8px; }
   .meta-bar .dot { width: 3px; height: 3px; background: var(--wine); border-radius: 50%; }
   @media (max-width: 560px) { .meta-bar { display: none; } }
-
-  .media-fade { transition: opacity 0.5s ease; }
-  .media-fade.out { opacity: 0; }
 
   .content-section {
     position: relative;
@@ -307,7 +282,7 @@
 
   @media (prefers-reduced-motion: reduce) {
     .scroll-line::after { animation: none; }
-    .title-first, .media-frame, .content-section, .mode-toggle button, .btn-ghost, .btn-wine, .media-fade {
+    .title-first, .media-frame, .content-section, .btn-ghost, .btn-wine {
       transition: none !important;
     }
   }
@@ -324,11 +299,6 @@
       <div class="brand-name serif">The Always</div>
       <div class="brand-est">Est. {{ Year }}</div>
     </div>
-  </div>
-
-  <div class="mode-toggle" role="tablist">
-    <button id="btnVideo" class="active" role="tab" aria-selected="true">Film</button>
-    <button id="btnImage" role="tab" aria-selected="false">Still</button>
   </div>
 
   <nav class="top-nav">
@@ -352,7 +322,7 @@
     <div class="chapter-tag">Chapter I · A Letter Without End</div>
   </div>
 
-  <div id="mediaFrame" class="media-frame media-fade" style="width: 300px; height: 400px; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 3;">
+  <div id="mediaFrame" class="media-frame" style="width: 300px; height: 400px; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 3;">
     <!-- Swap in your own clip: add <source src="media/us.mp4" type="video/mp4"> inside this <video> -->
     <video id="mediaVideo" class="media-el" autoplay muted loop playsinline aria-hidden="true"></video>
     <!-- Swap in your own photo: set the src attribute below -->
@@ -442,30 +412,30 @@
   var titleFirst = document.getElementById('titleFirst');
   var contentSection = document.getElementById('letter');
   var progressFill = document.getElementById('progressFill');
-  var btnVideo = document.getElementById('btnVideo');
-  var btnImage = document.getElementById('btnImage');
   var replayBtn = document.getElementById('replayBtn');
 
   var CIRC = 2 * Math.PI * 22;
-
-  var metaByMode = {
-    video: { date: '{{ Season, Year }}', tag: '{{ a two-word mood }}' },
-    image: { date: '{{ Season, Year }}', tag: '{{ a two-word mood }}' }
-  };
 
   var state = {
     progress: reduced ? 1 : 0,
     fullyExpanded: reduced ? true : false,
     touchStartY: 0,
-    mode: 'video',
     isMobile: window.innerWidth < 768
   };
 
   function hasRealVideo() { return video.querySelector('source') !== null; }
   function hasRealImage() { return !!image.getAttribute('src'); }
-  function updatePlaceholder() {
-    var showing = state.mode === 'video' ? hasRealVideo() : hasRealImage();
-    placeholder.style.display = showing ? 'none' : 'flex';
+
+  function pickInitialMedia() {
+    if (hasRealVideo()) {
+      image.classList.add('hidden');
+      video.classList.remove('hidden');
+      video.play().catch(function () {});
+    } else if (hasRealImage()) {
+      video.classList.add('hidden');
+      image.classList.remove('hidden');
+    }
+    placeholder.style.display = (hasRealVideo() || hasRealImage()) ? 'none' : 'flex';
   }
 
   function applyProgress() {
@@ -547,45 +517,6 @@
     applyProgress();
   });
 
-  function switchMode(mode) {
-    if (mode === state.mode) return;
-    state.mode = mode;
-
-    btnVideo.classList.toggle('active', mode === 'video');
-    btnImage.classList.toggle('active', mode === 'image');
-    btnVideo.setAttribute('aria-selected', mode === 'video');
-    btnImage.setAttribute('aria-selected', mode === 'image');
-
-    frame.classList.add('out');
-    setTimeout(function () {
-      var meta = metaByMode[mode];
-      document.getElementById('metaDate').textContent = meta.date;
-      document.getElementById('metaTag').textContent = meta.tag;
-
-      if (mode === 'video') {
-        video.classList.remove('hidden');
-        image.classList.add('hidden');
-        if (hasRealVideo()) { video.play().catch(function () {}); }
-      } else {
-        video.pause();
-        video.classList.add('hidden');
-        image.classList.remove('hidden');
-      }
-      updatePlaceholder();
-
-      if (!reduced) {
-        state.fullyExpanded = false;
-        setProgress(0);
-        window.scrollTo(0, 0);
-      }
-
-      frame.classList.remove('out');
-    }, 420);
-  }
-
-  btnVideo.addEventListener('click', function () { switchMode('video'); });
-  btnImage.addEventListener('click', function () { switchMode('image'); });
-
   replayBtn.addEventListener('click', function () {
     if (!reduced) {
       state.fullyExpanded = false;
@@ -595,8 +526,7 @@
   });
 
   applyProgress();
-  updatePlaceholder();
-  if (hasRealVideo()) { video.play().catch(function () {}); }
+  pickInitialMedia();
 })();
 </script>
 
