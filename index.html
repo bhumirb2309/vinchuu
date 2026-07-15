@@ -1,0 +1,766 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>For You — a small site</title>
+<style>
+  /* ---------- tokens ---------- */
+  :root {
+    color-scheme: light;
+    --parchment: #fefffc;
+    --paper: #ffffff;
+    --linen: #f9faf7;
+    --ink: #171717;
+    --graphite: #2c2c2c;
+    --charcoal: #444141;
+    --ash: #646464;
+    --fog: #b4b8b4;
+    --mist: #dee2de;
+    --twilight: #282834;
+    --dusk: #1f1f29;
+    --dusk-text: #ffffff;
+    --signal: #41a1cf;
+    --cerulean: #0081c0;
+    --star-opacity: 0;
+    --petal-opacity: 0.85;
+    --sky-top: #dff0f7;
+    --sky-mid: #eaf6fb;
+    --sky-bottom: var(--parchment);
+    --hill-far: var(--mist);
+    --hill-near: var(--fog);
+    --orb: var(--paper);
+    --orb-glow: rgba(65, 161, 207, 0.35);
+
+    --font-display: 'Iowan Old Style', 'Palatino Linotype', 'URW Palladio L', 'Book Antiqua', Georgia, 'Times New Roman', serif;
+    --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+    --text-caption: 13px;
+    --text-body-sm: 15px;
+    --text-subheading: 18px;
+    --text-heading-sm: 27px;
+    --text-heading: 40px;
+    --text-heading-lg: 48px;
+    --text-display: 54px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+      --parchment: #121218;
+      --paper: #1a1a22;
+      --linen: #20212b;
+      --ink: #f7f5f0;
+      --graphite: #ece8df;
+      --charcoal: #c7c2b8;
+      --ash: #938e84;
+      --fog: #4a4952;
+      --mist: #34343e;
+      --twilight: #3a3a4a;
+      --dusk: #eeece4;
+      --dusk-text: #171717;
+      --signal: #5db4de;
+      --cerulean: #1791c9;
+      --star-opacity: 1;
+      --petal-opacity: 0.5;
+      --sky-top: #0d0e1c;
+      --sky-mid: #1c1d33;
+      --sky-bottom: var(--parchment);
+      --hill-far: #23242f;
+      --hill-near: #171821;
+      --orb: #f3f1e6;
+      --orb-glow: rgba(93, 180, 222, 0.28);
+    }
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    background: var(--parchment);
+    color: var(--charcoal);
+    font-family: var(--font-sans);
+    font-size: var(--text-body-sm);
+    line-height: 1.5;
+    letter-spacing: -0.01em;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  a { color: inherit; }
+
+  h1, h2, h3 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    color: var(--graphite);
+    line-height: 1.1;
+    text-wrap: balance;
+    margin: 0;
+    font-feature-settings: "liga" 0;
+  }
+
+  p { margin: 0; }
+
+  .eyebrow {
+    font-family: var(--font-sans);
+    font-size: var(--text-caption);
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ash);
+  }
+
+  button { font-family: inherit; cursor: pointer; }
+
+  :focus-visible {
+    outline: 2px solid var(--signal);
+    outline-offset: 3px;
+  }
+
+  /* ---------- nav ---------- */
+  .nav-wrap {
+    position: fixed;
+    top: 20px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    z-index: 50;
+    padding: 0 16px;
+  }
+
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    padding: 10px 12px 10px 18px;
+    border-radius: 50px;
+    border: 1px solid rgba(255,255,255,0.35);
+    background: rgba(255, 255, 255, 0.14);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: rgba(0, 0, 0, 0.15) 0px 2px 6px 0px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .nav { border-color: rgba(40,40,52,0.6); }
+  }
+
+  .nav-icon { color: var(--paper); display: flex; }
+  .nav-links { display: flex; gap: 20px; }
+  .nav-links a {
+    font-size: var(--text-body-sm);
+    font-weight: 500;
+    text-decoration: none;
+    color: var(--paper);
+    white-space: nowrap;
+  }
+  .nav-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--signal);
+    color: var(--signal);
+    background: transparent;
+    font-size: var(--text-body-sm);
+    font-weight: 500;
+    text-decoration: none;
+  }
+  .nav-cta .ring {
+    width: 16px; height: 16px; border-radius: 50%;
+    border: 1px solid var(--signal);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 10px;
+  }
+
+  @media (max-width: 640px) {
+    .nav-links { display: none; }
+  }
+
+  /* ---------- hero ---------- */
+  .hero {
+    position: relative;
+    height: 100vh;
+    min-height: 560px;
+    overflow: hidden;
+    perspective: 1200px;
+  }
+
+  .sky {
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, var(--sky-top) 0%, var(--sky-mid) 55%, var(--sky-bottom) 100%);
+    transition: background 0.6s ease;
+  }
+
+  .orb {
+    position: absolute;
+    top: 16%; right: 16%;
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: var(--orb);
+    box-shadow: 0 0 90px 30px var(--orb-glow);
+    transition: background 0.6s ease, box-shadow 0.6s ease;
+  }
+
+  .stars { position: absolute; inset: 0; }
+  .star {
+    position: absolute;
+    width: 2px; height: 2px;
+    background: var(--paper);
+    border-radius: 50%;
+    opacity: var(--star-opacity);
+    transition: opacity 0.6s ease;
+    animation: twinkle 4.5s ease-in-out infinite;
+  }
+  @keyframes twinkle { 0%, 100% { opacity: calc(var(--star-opacity) * 0.3); } 50% { opacity: var(--star-opacity); } }
+
+  .hill { position: absolute; left: -5%; right: -5%; bottom: 0; }
+  .hill-far {
+    height: 34%;
+    background: var(--hill-far);
+    clip-path: polygon(0% 60%, 12% 45%, 30% 58%, 48% 40%, 66% 55%, 84% 38%, 100% 52%, 100% 100%, 0% 100%);
+    transition: background 0.6s ease;
+  }
+  .hill-near {
+    height: 22%;
+    background: var(--hill-near);
+    clip-path: polygon(0% 55%, 18% 70%, 35% 48%, 55% 66%, 72% 45%, 90% 62%, 100% 50%, 100% 100%, 0% 100%);
+    transition: background 0.6s ease;
+  }
+
+  .petals { position: absolute; inset: 0; pointer-events: none; }
+  .petal {
+    position: absolute;
+    top: -5%;
+    width: 8px; height: 8px;
+    border-radius: 60% 40% 55% 45%;
+    background: var(--signal);
+    opacity: var(--petal-opacity);
+    animation: drift linear infinite;
+  }
+  @keyframes drift {
+    0% { transform: translateY(-10vh) translateX(0) rotate(0deg); }
+    100% { transform: translateY(115vh) translateX(40px) rotate(220deg); }
+  }
+
+  .hero-card-wrap {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    display: flex;
+    justify-content: flex-start;
+    padding: 0 32px 64px;
+    transform-style: preserve-3d;
+  }
+
+  .hero-card {
+    max-width: 560px;
+    padding: 40px 40px 36px;
+    border-radius: 24px;
+    background: rgba(255,255,255,0.5);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(255,255,255,0.5);
+    box-shadow: rgba(0,0,0,0.06) 0px 2px 2px 0px, rgba(0,0,0,0.04) 0px 0px 0px 5px;
+    transform: translateZ(0);
+    transition: transform 0.15s ease-out;
+    will-change: transform;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .hero-card {
+      background: rgba(26,26,34,0.55);
+      border-color: rgba(255,255,255,0.08);
+    }
+  }
+
+  .hero-card h1 {
+    font-size: var(--text-display);
+    letter-spacing: -0.02em;
+    margin-bottom: 16px;
+  }
+
+  .hero-card p {
+    font-size: var(--text-subheading);
+    color: var(--charcoal);
+    line-height: 1.5;
+    margin-bottom: 24px;
+  }
+
+  /* ---------- buttons ---------- */
+  .btn-outline {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--signal);
+    color: var(--signal);
+    background: transparent;
+    font-size: var(--text-body-sm);
+    font-weight: 500;
+    text-decoration: none;
+  }
+  .btn-outline .ring {
+    width: 18px; height: 18px; border-radius: 50%;
+    border: 1px solid var(--signal);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 11px;
+  }
+
+  .btn-filled {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    background: var(--dusk);
+    border: 1px solid var(--twilight);
+    color: var(--dusk-text);
+    font-size: var(--text-body-sm);
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  /* ---------- layout ---------- */
+  main { background: var(--paper); }
+
+  section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 80px 32px;
+  }
+
+  @media (max-width: 720px) {
+    section { padding: 56px 20px; }
+  }
+
+  .short-version { max-width: 900px; }
+  .short-version h2 {
+    font-size: var(--text-heading);
+    letter-spacing: -0.02em;
+    margin-bottom: 24px;
+  }
+  .short-version .lede {
+    font-size: var(--text-subheading);
+    color: var(--charcoal);
+    line-height: 1.6;
+    max-width: 68ch;
+  }
+  .short-version .fill {
+    background: linear-gradient(transparent 60%, rgba(65,161,207,0.22) 60%);
+    padding: 0 1px;
+  }
+
+  /* two column diagram section */
+  .inventory {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+    align-items: start;
+  }
+  @media (max-width: 860px) {
+    .inventory { grid-template-columns: 1fr; gap: 40px; }
+  }
+  .inventory h2 {
+    font-size: var(--text-heading-sm);
+    margin-bottom: 16px;
+  }
+  .inventory-list { list-style: none; margin: 24px 0 0; padding: 0; display: flex; flex-direction: column; gap: 16px; }
+  .inventory-list li {
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--mist);
+    color: var(--charcoal);
+    font-size: var(--text-body-sm);
+    line-height: 1.5;
+  }
+  .inventory-list li:last-child { border-bottom: none; }
+
+  .diagram-card {
+    border-radius: 16px;
+    background: var(--linen);
+    border: 1px solid var(--mist);
+    box-shadow: rgba(0,0,0,0.05) 0px 1px 8px 0px;
+    padding: 12px;
+    transform-style: preserve-3d;
+    transition: transform 0.15s ease-out;
+    will-change: transform;
+  }
+  .diagram-card figure {
+    margin: 0;
+    aspect-ratio: 4 / 3;
+    border-radius: 8px;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: repeat(16, 1fr);
+    grid-template-rows: repeat(12, 1fr);
+    background: var(--paper);
+  }
+  .diagram-card figcaption {
+    padding: 12px 4px 2px;
+    font-size: var(--text-caption);
+    color: var(--ash);
+  }
+  .px { width: 100%; height: 100%; }
+
+  /* ---------- timeline ---------- */
+  .timeline { background: var(--linen); border-top: 1px solid var(--mist); border-bottom: 1px solid var(--mist); }
+  .timeline-inner { max-width: 1200px; margin: 0 auto; padding: 80px 32px; }
+  .timeline h2 { font-size: var(--text-heading-sm); margin-bottom: 40px; }
+  .timeline-rows { display: flex; flex-direction: column; gap: 0; }
+  .t-row {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 24px;
+    padding: 24px 0;
+    border-top: 1px solid var(--mist);
+    transform-style: preserve-3d;
+    transition: transform 0.15s ease-out;
+    will-change: transform;
+  }
+  .t-row:last-child { border-bottom: 1px solid var(--mist); }
+  .t-date {
+    font-family: var(--font-display);
+    font-size: var(--text-heading-sm);
+    color: var(--graphite);
+    letter-spacing: -0.02em;
+  }
+  .t-body h3 { font-size: var(--text-subheading); font-family: var(--font-sans); font-weight: 500; color: var(--graphite); margin-bottom: 6px; }
+  .t-body p { color: var(--ash); font-size: var(--text-body-sm); }
+  @media (max-width: 640px) {
+    .t-row { grid-template-columns: 1fr; gap: 4px; }
+  }
+
+  /* ---------- ask / atmospheric ---------- */
+  .ask-wrap { padding: 80px 32px; }
+  .ask {
+    max-width: 1200px;
+    margin: 0 auto;
+    border-radius: 24px;
+    background: linear-gradient(160deg, var(--cerulean), #045f8f);
+    padding: 96px 48px;
+    text-align: center;
+    box-shadow: rgba(0,0,0,0.06) 0px 2px 2px 0px, rgba(0,0,0,0.04) 0px 0px 0px 5px;
+    position: relative;
+  }
+  .ask .eyebrow { color: rgba(255,255,255,0.75); }
+  .ask h2 {
+    color: #ffffff;
+    font-size: var(--text-heading-lg);
+    letter-spacing: -0.02em;
+    max-width: 20ch;
+    margin: 16px auto 40px;
+  }
+  .ask-actions {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    position: relative;
+    height: 60px;
+  }
+  .ask-yes {
+    padding: 10px 22px;
+    border-radius: 8px;
+    background: #ffffff;
+    color: var(--cerulean);
+    border: 1px solid #ffffff;
+    font-weight: 500;
+    font-size: var(--text-body-sm);
+  }
+  .ask-no {
+    padding: 10px 22px;
+    border-radius: 8px;
+    background: transparent;
+    color: #ffffff;
+    border: 1px solid rgba(255,255,255,0.6);
+    font-weight: 500;
+    font-size: var(--text-body-sm);
+    position: relative;
+    transition: transform 0.18s ease;
+  }
+  .ask-result {
+    margin-top: 20px;
+    color: #ffffff;
+    font-family: var(--font-display);
+    font-size: var(--text-subheading);
+    min-height: 24px;
+  }
+
+  /* ---------- footer ---------- */
+  footer {
+    background: var(--paper);
+    border-top: 1px solid var(--mist);
+    padding: 80px 32px 48px;
+  }
+  .footer-inner { max-width: 1200px; margin: 0 auto; }
+  footer h2 {
+    font-size: var(--text-heading);
+    max-width: 16ch;
+    letter-spacing: -0.02em;
+    margin-bottom: 40px;
+  }
+  .footer-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 24px;
+    padding-top: 32px;
+    border-top: 1px solid var(--mist);
+  }
+  .footer-links { display: flex; gap: 24px; flex-wrap: wrap; }
+  .footer-links a { font-size: var(--text-body-sm); color: var(--ash); text-decoration: none; }
+  .footer-note { font-size: var(--text-caption); color: var(--fog); margin-top: 24px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .petal, .star { animation: none !important; }
+    .hero-card, .diagram-card, .t-row, .ask-no { transition: none !important; transform: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav-wrap">
+  <div class="nav">
+    <span class="nav-icon" aria-hidden="true">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="9" r="4" stroke="currentColor" stroke-width="1.4"/>
+        <path d="M3 19c1.8-3.5 5-5.5 9-5.5s7.2 2 9 5.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+      </svg>
+    </span>
+    <div class="nav-links">
+      <a href="#story">The Story</a>
+      <a href="#timeline">Timeline</a>
+      <a href="#ask">The Fine Print</a>
+    </div>
+    <a class="nav-cta" href="#story">Start reading <span class="ring">→</span></a>
+  </div>
+</nav>
+
+<header class="hero" id="hero">
+  <div class="sky"></div>
+  <div class="stars" id="stars"></div>
+  <div class="orb"></div>
+  <div class="hill hill-far"></div>
+  <div class="hill hill-near"></div>
+  <div class="petals" id="petals"></div>
+
+  <div class="hero-card-wrap">
+    <div class="hero-card" id="heroCard">
+      <p class="eyebrow">for {{ partner's name }}</p>
+      <h1>On an ordinary night that isn't ordinary at all.</h1>
+      <p>Everything on this page is true. I just don't always say it out loud, so I built somewhere to keep it.</p>
+      <a class="btn-outline" href="#story">Start reading <span class="ring">→</span></a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="short-version" id="story">
+    <p class="eyebrow">The short version</p>
+    <h2>How this started</h2>
+    <p class="lede">
+      We met <span class="fill">{{ on a Tuesday you'll remember better than I do }}</span>, at
+      <span class="fill">{{ the place }}</span>, and I don't remember deciding to like you —
+      it happened somewhere between the second conversation and the tenth, quietly, the way weather changes.
+      This is the part where I'm supposed to be clever about it. I'd rather just say: I noticed, and I haven't stopped.
+    </p>
+  </section>
+
+  <section class="inventory">
+    <div>
+      <p class="eyebrow">A small inventory</p>
+      <h2>Things I keep meaning to tell you</h2>
+      <ul class="inventory-list">
+        <li>{{ The specific, unreasonable joy you take in finding a parking spot. }}</li>
+        <li>{{ How you narrate nature documentaries under your breath, badly, on purpose. }}</li>
+        <li>{{ That you kept the ticket stub. I know you did. }}</li>
+        <li>{{ You make the ordinary Tuesday version of this feel like the good part, not the wait. }}</li>
+      </ul>
+    </div>
+    <div class="diagram-card" id="diagramCard">
+      <figure id="pixelFlower"></figure>
+      <figcaption>Fig. 1 — the low-res flower. Not everything here has to be painterly.</figcaption>
+    </div>
+  </section>
+
+  <section class="timeline" id="timeline">
+    <div class="timeline-inner">
+      <p class="eyebrow">In order, mostly</p>
+      <h2>How we got here</h2>
+      <div class="timeline-rows" id="timelineRows">
+        <div class="t-row">
+          <div class="t-date">{{ Mon YYYY }}</div>
+          <div class="t-body">
+            <h3>{{ The first one }}</h3>
+            <p>{{ A line about what actually happened, not the highlight-reel version. }}</p>
+          </div>
+        </div>
+        <div class="t-row">
+          <div class="t-date">{{ Mon YYYY }}</div>
+          <div class="t-body">
+            <h3>{{ The one that changed things }}</h3>
+            <p>{{ What you said, or didn't, that you didn't know mattered. }}</p>
+          </div>
+        </div>
+        <div class="t-row">
+          <div class="t-date">{{ Mon YYYY }}</div>
+          <div class="t-body">
+            <h3>{{ Today, more or less }}</h3>
+            <p>{{ Where things stand, plainly, no metaphor required. }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="ask-wrap" id="ask">
+    <div class="ask">
+      <p class="eyebrow">the fine print</p>
+      <h2>Be my plus-one. Indefinitely?</h2>
+      <div class="ask-actions">
+        <button class="ask-yes" id="yesBtn">Yes, obviously</button>
+        <button class="ask-no" id="noBtn">Let me think</button>
+      </div>
+      <p class="ask-result" id="askResult"></p>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <h2>This page has no analytics. No one will ever see it but you. That's the point.</h2>
+    <div class="footer-row">
+      <div class="footer-links">
+        <a href="#story">The Story</a>
+        <a href="#timeline">Timeline</a>
+        <a href="#ask">The Fine Print</a>
+      </div>
+      <a class="btn-filled" href="mailto:{{your-email@example.com}}">Write back →</a>
+    </div>
+    <p class="footer-note">Built by hand, {{ Month Year }}. Replace every {{ bracket }} with the real thing.</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var starsEl = document.getElementById('stars');
+  var starCount = 40;
+  for (var i = 0; i < starCount; i++) {
+    var s = document.createElement('div');
+    s.className = 'star';
+    s.style.left = Math.random() * 100 + '%';
+    s.style.top = Math.random() * 70 + '%';
+    s.style.animationDelay = (Math.random() * 4).toFixed(2) + 's';
+    starsEl.appendChild(s);
+  }
+
+  if (!reduced) {
+    var petalsEl = document.getElementById('petals');
+    var petalCount = 10;
+    for (var p = 0; p < petalCount; p++) {
+      var el = document.createElement('div');
+      el.className = 'petal';
+      el.style.left = Math.random() * 100 + '%';
+      el.style.animationDuration = (9 + Math.random() * 8).toFixed(1) + 's';
+      el.style.animationDelay = (Math.random() * 10).toFixed(1) + 's';
+      el.style.opacity = (0.4 + Math.random() * 0.5).toFixed(2);
+      petalsEl.appendChild(el);
+    }
+  }
+
+  var flowerEl = document.getElementById('pixelFlower');
+  var grid = [
+    "0000000000000000",
+    "0000000110000000",
+    "0000011221100000",
+    "0000122222210000",
+    "0001222332221000",
+    "0012223333222100",
+    "0012233333322100",
+    "0001222332221000",
+    "0000122222210000",
+    "0000001100000000",
+    "0000004440000000",
+    "0000000000000000"
+  ];
+  var palette = { "0": "transparent", "1": "var(--signal)", "2": "#ffe08a", "3": "var(--cerulean)", "4": "var(--charcoal)" };
+  grid.forEach(function (row) {
+    row.split('').forEach(function (ch) {
+      var cell = document.createElement('div');
+      cell.className = 'px';
+      cell.style.background = palette[ch] || 'transparent';
+      flowerEl.appendChild(cell);
+    });
+  });
+
+  function tilt(el, strength) {
+    if (reduced) return;
+    var bounds;
+    el.addEventListener('pointerenter', function () { bounds = el.getBoundingClientRect(); });
+    el.addEventListener('pointermove', function (e) {
+      if (!bounds) bounds = el.getBoundingClientRect();
+      var px = (e.clientX - bounds.left) / bounds.width - 0.5;
+      var py = (e.clientY - bounds.top) / bounds.height - 0.5;
+      el.style.transform = 'perspective(900px) rotateX(' + (-py * strength) + 'deg) rotateY(' + (px * strength) + 'deg)';
+    });
+    el.addEventListener('pointerleave', function () {
+      el.style.transform = 'perspective(900px) rotateX(0deg) rotateY(0deg)';
+    });
+  }
+
+  tilt(document.getElementById('heroCard'), 8);
+  tilt(document.getElementById('diagramCard'), 6);
+  document.querySelectorAll('.t-row').forEach(function (row) { tilt(row, 3); });
+
+  if (!reduced) {
+    var far = document.querySelector('.hill-far');
+    var near = document.querySelector('.hill-near');
+    var orb = document.querySelector('.orb');
+    var hero = document.getElementById('hero');
+    window.addEventListener('scroll', function () {
+      var rect = hero.getBoundingClientRect();
+      if (rect.bottom < 0 || rect.top > window.innerHeight) return;
+      var y = -rect.top;
+      far.style.transform = 'translateY(' + (y * 0.12) + 'px)';
+      near.style.transform = 'translateY(' + (y * 0.22) + 'px)';
+      orb.style.transform = 'translateY(' + (y * 0.06) + 'px)';
+    }, { passive: true });
+  }
+
+  var noBtn = document.getElementById('noBtn');
+  var yesBtn = document.getElementById('yesBtn');
+  var result = document.getElementById('askResult');
+  var actions = document.querySelector('.ask-actions');
+  var dodges = 0;
+  var maxDodges = 5;
+
+  function dodge() {
+    if (reduced || dodges >= maxDodges) return;
+    dodges++;
+    var bounds = actions.getBoundingClientRect();
+    var btnBounds = noBtn.getBoundingClientRect();
+    var maxX = bounds.width - btnBounds.width;
+    var maxY = bounds.height - btnBounds.height;
+    var x = Math.random() * maxX - maxX / 2;
+    var y = Math.random() * maxY - maxY / 2;
+    noBtn.style.position = 'relative';
+    noBtn.style.transform = 'translate(' + x + 'px,' + y + 'px)';
+  }
+
+  noBtn.addEventListener('pointerenter', dodge);
+  noBtn.addEventListener('click', function () {
+    result.textContent = "That's not a real option, but I admire the effort.";
+  });
+  yesBtn.addEventListener('click', function () {
+    result.textContent = "Noted. Permanently.";
+  });
+})();
+</script>
+
+</body>
+</html>
