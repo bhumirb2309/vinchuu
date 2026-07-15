@@ -194,14 +194,40 @@
     transition: background 0.6s ease;
   }
 
+  .grain {
+    position: absolute; inset: 0;
+    opacity: 0.05;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .clouds { position: absolute; inset: 0; overflow: hidden; }
+  .cloud {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, rgba(255,255,255,0.9), rgba(255,255,255,0) 70%);
+    opacity: 0.5;
+    filter: blur(1px);
+    transition: opacity 0.6s ease;
+  }
+  @media (prefers-color-scheme: dark) { .cloud { opacity: 0.08; } }
+
   .orb {
     position: absolute;
     top: 16%; right: 16%;
     width: 120px; height: 120px;
     border-radius: 50%;
-    background: var(--orb);
-    box-shadow: 0 0 90px 30px var(--orb-glow);
+    background: radial-gradient(circle at 38% 32%, color-mix(in srgb, var(--orb) 100%, white 20%), var(--orb) 60%);
+    box-shadow: 0 0 20px 4px var(--orb-glow), 0 0 90px 34px var(--orb-glow);
     transition: background 0.6s ease, box-shadow 0.6s ease;
+  }
+
+  .flowers { position: absolute; inset: 0; pointer-events: none; }
+  .flower {
+    position: absolute;
+    border-radius: 50%;
+    transition: opacity 0.6s ease;
   }
 
   .stars { position: absolute; inset: 0; }
@@ -256,13 +282,13 @@
 
   .hero-card {
     max-width: 560px;
-    padding: 40px 40px 36px;
+    padding: 44px 44px 40px;
     border-radius: 24px;
-    background: rgba(255,255,255,0.5);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-    border: 1px solid rgba(255,255,255,0.5);
-    box-shadow: rgba(0,0,0,0.06) 0px 2px 2px 0px, rgba(0,0,0,0.04) 0px 0px 0px 5px;
+    background: rgba(255,255,255,0.72);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.7);
+    box-shadow: rgba(0,0,0,0.08) 0px 8px 24px 0px, rgba(0,0,0,0.05) 0px 0px 0px 1px;
     transform: translateZ(0);
     transition: transform 0.15s ease-out;
     will-change: transform;
@@ -270,8 +296,8 @@
 
   @media (prefers-color-scheme: dark) {
     .hero-card {
-      background: rgba(26,26,34,0.55);
-      border-color: rgba(255,255,255,0.08);
+      background: rgba(20,20,27,0.72);
+      border-color: rgba(255,255,255,0.1);
     }
   }
 
@@ -541,11 +567,14 @@
 
 <header class="hero" id="hero">
   <div class="sky"></div>
+  <div class="clouds" id="clouds"></div>
   <div class="stars" id="stars"></div>
   <div class="orb"></div>
   <div class="hill hill-far"></div>
   <div class="hill hill-near"></div>
+  <div class="flowers" id="flowers"></div>
   <div class="petals" id="petals"></div>
+  <div class="grain"></div>
 
   <div class="hero-card-wrap">
     <div class="hero-card" id="heroCard">
@@ -657,6 +686,41 @@
     s.style.top = Math.random() * 70 + '%';
     s.style.animationDelay = (Math.random() * 4).toFixed(2) + 's';
     starsEl.appendChild(s);
+  }
+
+  // clouds
+  var cloudsEl = document.getElementById('clouds');
+  var cloudSpecs = [
+    { w: 260, h: 90, top: '10%', left: '4%' },
+    { w: 180, h: 70, top: '22%', left: '58%' },
+    { w: 320, h: 110, top: '6%', left: '30%' },
+    { w: 150, h: 60, top: '30%', left: '80%' }
+  ];
+  cloudSpecs.forEach(function (c) {
+    var el = document.createElement('div');
+    el.className = 'cloud';
+    el.style.width = c.w + 'px';
+    el.style.height = c.h + 'px';
+    el.style.top = c.top;
+    el.style.left = c.left;
+    cloudsEl.appendChild(el);
+  });
+
+  // flowers along the near hill line
+  var flowersEl = document.getElementById('flowers');
+  var flowerColors = ['var(--signal)', 'var(--cerulean)', 'var(--paper)'];
+  var flowerCount = 26;
+  for (var f = 0; f < flowerCount; f++) {
+    var fl = document.createElement('div');
+    fl.className = 'flower';
+    var size = 3 + Math.random() * 4;
+    fl.style.width = size + 'px';
+    fl.style.height = size + 'px';
+    fl.style.left = Math.random() * 100 + '%';
+    fl.style.bottom = (Math.random() * 16 + 2) + '%';
+    fl.style.background = flowerColors[Math.floor(Math.random() * flowerColors.length)];
+    fl.style.opacity = (0.5 + Math.random() * 0.4).toFixed(2);
+    flowersEl.appendChild(fl);
   }
 
   if (!reduced) {
