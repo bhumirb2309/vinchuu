@@ -796,6 +796,7 @@
   frame.addEventListener('click', function (e) {
     if (e.target.closest('.sound-toggle')) return;
     triggerHeartBurst();
+    if (!reduced) setProgress(1);
   });
 
   function applyProgress() {
