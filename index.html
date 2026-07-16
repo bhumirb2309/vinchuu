@@ -317,16 +317,16 @@
   <div class="title-wrap">
     <h1 class="hero-title">
       <span id="titleFirst" class="title-first">Always,</span>
-      <span class="title-rest">for {{ her name }}</span>
+      <span class="title-rest">for Vinit</span>
     </h1>
     <div class="chapter-tag">Chapter I · A Letter Without End</div>
   </div>
 
   <div id="mediaFrame" class="media-frame" style="width: 300px; height: 400px; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 3;">
-    <!-- Swap in your own clip: add <source src="media/us.mp4" type="video/mp4"> inside this <video> -->
-    <video id="mediaVideo" class="media-el" autoplay muted loop playsinline aria-hidden="true"></video>
-    <!-- Swap in your own photo: set the src attribute below -->
-    <img id="mediaImage" class="media-el hidden" src="" alt="{{ describe the photo for anyone using a screen reader }}" />
+    <video id="mediaVideo" class="media-el" autoplay muted loop playsinline preload="auto" poster="media/us.jpg" aria-hidden="true">
+      <source src="media/us.mp4" type="video/mp4">
+    </video>
+    <img id="mediaImage" class="media-el hidden" src="media/us.jpg" alt="A mirror selfie, caught mid-thought." />
     <div class="media-placeholder" id="mediaPlaceholder">Drop a photo or video in here</div>
   </div>
 
