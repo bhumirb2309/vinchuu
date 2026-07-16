@@ -68,6 +68,21 @@
       0 18px 36px -18px rgba(107,31,42,0.35);
     transition: box-shadow 0.4s ease;
   }
+  .heart-rain { position: absolute; inset: 0; z-index: 1; overflow: hidden; pointer-events: none; }
+  .heart {
+    position: absolute;
+    top: -8%;
+    color: var(--wine);
+    opacity: 0;
+    animation: heart-fall linear infinite;
+  }
+  @keyframes heart-fall {
+    0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0; }
+    8% { opacity: 0.55; }
+    92% { opacity: 0.4; }
+    100% { transform: translateY(112vh) translateX(var(--drift, 30px)) rotate(25deg); opacity: 0; }
+  }
+
   .media-el { width: 100%; height: 100%; object-fit: cover; display: block; }
   .hidden { display: none; }
 
@@ -355,6 +370,7 @@
     .title-first, .media-frame, .content-section, .btn-ghost, .btn-wine {
       transition: none !important;
     }
+    .heart-rain { display: none; }
   }
 </style>
 </head>
@@ -374,7 +390,6 @@
   <nav class="top-nav">
     <a href="#letter">Letters</a>
     <a href="#archive">Archive</a>
-    <a href="mailto:{{your-email@example.com}}">Devote</a>
   </nav>
 </div>
 
@@ -384,6 +399,8 @@
 <div class="corner br"></div>
 
 <section id="hero" class="hero">
+  <div class="heart-rain" id="heartRain" aria-hidden="true"></div>
+
   <div class="title-wrap">
     <h1 class="hero-title">
       <span id="titleFirst" class="title-first">To the One Who Became</span>
@@ -691,6 +708,23 @@
 <script>
 (function () {
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var heartRain = document.getElementById('heartRain');
+  if (heartRain && !reduced) {
+    var heartGlyphs = ['♡', '❤'];
+    var heartCount = 16;
+    for (var h = 0; h < heartCount; h++) {
+      var heart = document.createElement('span');
+      heart.className = 'heart';
+      heart.textContent = heartGlyphs[Math.floor(Math.random() * heartGlyphs.length)];
+      heart.style.left = Math.random() * 100 + '%';
+      heart.style.fontSize = (12 + Math.random() * 14) + 'px';
+      heart.style.setProperty('--drift', (Math.random() * 60 - 30) + 'px');
+      heart.style.animationDuration = (10 + Math.random() * 10) + 's';
+      heart.style.animationDelay = (Math.random() * 14) + 's';
+      heartRain.appendChild(heart);
+    }
+  }
 
   var frame = document.getElementById('mediaFrame');
   var video = document.getElementById('mediaVideo');
