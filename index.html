@@ -134,13 +134,12 @@
   }
 
   .title-wrap {
-    position: absolute;
-    left: 50%; top: 50%;
-    transform: translate(-50%, -50%);
+    position: relative;
     width: 100%;
     pointer-events: none;
     text-align: center;
     z-index: 5;
+    flex-shrink: 0;
     padding: 0 16px;
   }
   .hero-title {
@@ -225,7 +224,8 @@
   .hero {
     position: relative;
     min-height: 100vh;
-    display: flex; align-items: center; justify-content: center;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 32px;
+    padding: 120px 24px 160px;
     overflow: hidden;
     z-index: 2;
   }
@@ -462,7 +462,7 @@
     <div class="chapter-tag">Chapter I · A Letter Without an Ending</div>
   </div>
 
-  <div id="mediaFrame" class="media-frame" style="width: 300px; height: 400px; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 3;">
+  <div id="mediaFrame" class="media-frame" style="width: 300px; height: 400px; flex-shrink: 0; z-index: 3;">
     <video id="mediaVideo" class="media-el hidden" muted loop playsinline preload="auto" poster="media/us.jpg" aria-hidden="true" data-has-audio="true">
       <source src="media/us-sound.mp4" type="video/mp4">
     </video>
