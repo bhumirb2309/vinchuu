@@ -407,6 +407,11 @@
       0 1px 0 rgba(255,255,255,0.4) inset,
       0 18px 36px -18px rgba(26,20,16,0.4);
   }
+  .archive-video:fullscreen,
+  .archive-video:-webkit-full-screen {
+    object-fit: contain;
+    background: #000;
+  }
 
   @media (prefers-reduced-motion: reduce) {
     .scroll-line::after { animation: none; }
