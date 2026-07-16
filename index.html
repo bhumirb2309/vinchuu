@@ -71,6 +71,28 @@
   .media-el { width: 100%; height: 100%; object-fit: cover; display: block; }
   .hidden { display: none; }
 
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+  }
+
+  .sound-toggle {
+    position: absolute;
+    bottom: 16px; right: 16px;
+    z-index: 4;
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: rgba(26,20,16,0.55);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.05rem;
+    color: var(--cream);
+    transition: background 0.2s ease, opacity 0.3s ease;
+  }
+  .sound-toggle:hover { background: rgba(26,20,16,0.75); }
+  .sound-toggle.hidden { display: none; }
+
   .media-placeholder {
     position: absolute; inset: 0;
     display: flex; align-items: center; justify-content: center;
@@ -323,11 +345,15 @@
   </div>
 
   <div id="mediaFrame" class="media-frame" style="width: 300px; height: 400px; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 3;">
-    <video id="mediaVideo" class="media-el" autoplay muted loop playsinline preload="auto" poster="media/us.jpg" aria-hidden="true">
-      <source src="media/us.mp4" type="video/mp4">
+    <video id="mediaVideo" class="media-el hidden" muted loop playsinline preload="auto" poster="media/us.jpg" aria-hidden="true">
+      <source src="media/hero.mp4" type="video/mp4">
     </video>
-    <img id="mediaImage" class="media-el hidden" src="media/us.jpg" alt="A mirror selfie, caught mid-thought." />
+    <img id="mediaImage" class="media-el" src="media/us.jpg" alt="A mirror selfie, caught mid-thought." />
     <div class="media-placeholder" id="mediaPlaceholder">Drop a photo or video in here</div>
+    <button id="soundToggle" class="sound-toggle hidden" type="button" aria-pressed="false">
+      <span id="soundIcon" aria-hidden="true">🔇</span>
+      <span class="sr-only">Toggle sound</span>
+    </button>
   </div>
 
   <div class="meta-bar">
@@ -409,6 +435,8 @@
   var video = document.getElementById('mediaVideo');
   var image = document.getElementById('mediaImage');
   var placeholder = document.getElementById('mediaPlaceholder');
+  var soundToggle = document.getElementById('soundToggle');
+  var soundIcon = document.getElementById('soundIcon');
   var titleFirst = document.getElementById('titleFirst');
   var contentSection = document.getElementById('letter');
   var progressFill = document.getElementById('progressFill');
@@ -420,23 +448,46 @@
     progress: reduced ? 1 : 0,
     fullyExpanded: reduced ? true : false,
     touchStartY: 0,
-    isMobile: window.innerWidth < 768
+    isMobile: window.innerWidth < 768,
+    media: 'photo'
   };
 
   function hasRealVideo() { return video.querySelector('source') !== null; }
   function hasRealImage() { return !!image.getAttribute('src'); }
 
+  function showPhoto() {
+    video.pause();
+    video.classList.add('hidden');
+    image.classList.remove('hidden');
+    soundToggle.classList.add('hidden');
+    state.media = 'photo';
+  }
+
+  function showVideo() {
+    if (!hasRealVideo()) return;
+    image.classList.add('hidden');
+    video.classList.remove('hidden');
+    video.play().catch(function () {});
+    soundToggle.classList.remove('hidden');
+    state.media = 'video';
+  }
+
   function pickInitialMedia() {
-    if (hasRealVideo()) {
-      image.classList.add('hidden');
-      video.classList.remove('hidden');
-      video.play().catch(function () {});
+    if (reduced) {
+      if (hasRealVideo()) { showVideo(); } else if (hasRealImage()) { showPhoto(); }
     } else if (hasRealImage()) {
-      video.classList.add('hidden');
-      image.classList.remove('hidden');
+      showPhoto();
+    } else if (hasRealVideo()) {
+      showVideo();
     }
     placeholder.style.display = (hasRealVideo() || hasRealImage()) ? 'none' : 'flex';
   }
+
+  soundToggle.addEventListener('click', function () {
+    video.muted = !video.muted;
+    soundToggle.setAttribute('aria-pressed', String(!video.muted));
+    soundIcon.textContent = video.muted ? '🔇' : '🔊';
+  });
 
   function applyProgress() {
     var p = state.progress;
@@ -463,6 +514,7 @@
   function setProgress(v) {
     state.progress = Math.max(0, Math.min(1, v));
     if (state.progress >= 1) state.fullyExpanded = true;
+    if (state.progress > 0 && state.media === 'photo') showVideo();
     applyProgress();
   }
 
@@ -520,7 +572,9 @@
   replayBtn.addEventListener('click', function () {
     if (!reduced) {
       state.fullyExpanded = false;
-      setProgress(0);
+      state.progress = 0;
+      showPhoto();
+      applyProgress();
     }
     window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' });
   });
