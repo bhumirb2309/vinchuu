@@ -58,6 +58,15 @@
     background: radial-gradient(ellipse at center, transparent 30%, rgba(26,20,16,0.28) 100%);
   }
 
+  .glow-orb { position: absolute; border-radius: 50%; filter: blur(60px); pointer-events: none; }
+  .glow-orb.a { width: 420px; height: 420px; top: 5%; left: 6%; opacity: 0.32; background: radial-gradient(circle, var(--rose), transparent 70%); animation: float-a 22s ease-in-out infinite; }
+  .glow-orb.b { width: 380px; height: 380px; bottom: 6%; right: 8%; opacity: 0.28; background: radial-gradient(circle, var(--amber), transparent 70%); animation: float-b 26s ease-in-out infinite; }
+  .glow-orb.c { width: 300px; height: 300px; top: 38%; right: 22%; opacity: 0.16; background: radial-gradient(circle, var(--wine), transparent 70%); animation: float-c 30s ease-in-out infinite; }
+  @keyframes float-a { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(40px, -30px) scale(1.08); } }
+  @keyframes float-b { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-35px, 25px) scale(0.95); } }
+  @keyframes float-c { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(20px, 20px) scale(1.05); } }
+  @media (prefers-reduced-motion: reduce) { .glow-orb { animation: none; } }
+
   .media-frame {
     position: relative;
     border-radius: 6px;
@@ -193,6 +202,17 @@
   .top-nav { display: flex; align-items: center; gap: 28px; font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase; }
   .top-nav a { text-decoration: none; transition: opacity 0.2s ease; }
   .top-nav a:hover { opacity: 0.6; }
+  .nav-heart {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    border: 1px solid var(--wine);
+    color: var(--wine);
+    background: transparent;
+    font-size: 0.85rem;
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: transform 0.2s ease, background 0.2s ease;
+  }
+  .nav-heart:hover { background: var(--wine); color: var(--cream); transform: scale(1.1); }
   @media (max-width: 760px) { .top-nav { display: none; } }
 
   .corner { position: absolute; width: 22px; height: 22px; border-color: rgba(26,20,16,0.35); z-index: 5; }
@@ -399,7 +419,11 @@
 </head>
 <body>
 
-<div class="scene-bg" id="sceneBg"></div>
+<div class="scene-bg" id="sceneBg">
+  <div class="glow-orb a"></div>
+  <div class="glow-orb b"></div>
+  <div class="glow-orb c"></div>
+</div>
 
 <div class="top-bar">
   <div class="brand">
@@ -413,6 +437,7 @@
   <nav class="top-nav">
     <a href="#letter">Letters</a>
     <a href="#archive">Archive</a>
+    <button class="nav-heart" id="navHeart" type="button" aria-label="A little surprise">♡</button>
   </nav>
 </div>
 
@@ -865,6 +890,14 @@
     triggerHeartBurst();
     if (!reduced) setProgress(1);
   });
+
+  var navHeart = document.getElementById('navHeart');
+  if (navHeart) {
+    navHeart.addEventListener('click', function () {
+      document.getElementById('hero').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth' });
+      triggerHeartBurst();
+    });
+  }
 
   function applyProgress() {
     var p = state.progress;
